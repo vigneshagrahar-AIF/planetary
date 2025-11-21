@@ -6,7 +6,7 @@
     ========================================================== -->
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Your Weight Across the Solar System</title>
 
     <!-- =========================================================
@@ -71,7 +71,6 @@
 
         /* =====================================================
            MAIN WRAPPER WITH NEBULA BACKGROUND
-           (served from /static/backgroundimg.jpg)
         ====================================================== */
         #report-wrapper {
             position: relative;
@@ -226,7 +225,7 @@
             font-weight: 600;
             font-size: 1.25rem;
             border: none;
-            border-radius: 999px;
+            border-radius: 40px;
             cursor: pointer;
             box-shadow:
                 0 10px 28px rgba(0,0,0,0.45),
@@ -347,41 +346,55 @@
             border-color: #ff4a4a;
         }
 
-        #submit-weight-btn {
+        #submit-weight-btn,
+        #bluetooth-weight-btn {
             padding: 6px 22px;
-            background: linear-gradient(135deg,
-                        #2ecc71,
-                        #19b463);
-            color: #fff;
-            font-size: 0.95rem;
-            border: none;
+            font-size: 0.9rem;
             border-radius: 999px;
+            border: none;
             cursor: pointer;
             margin-top: 4px;
-            box-shadow:
-                0 7px 18px rgba(0,0,0,0.45),
-                0 0 10px rgba(46,204,113,0.55);
             transition:
                 transform 0.18s ease,
                 box-shadow 0.18s ease,
                 filter 0.18s ease;
         }
 
-        #submit-weight-btn:hover:enabled {
-            transform: translateY(-1px) scale(1.01);
+        #submit-weight-btn {
+            background: linear-gradient(135deg,
+                        #2ecc71,
+                        #19b463);
+            color: #fff;
             box-shadow:
-                0 10px 22px rgba(0,0,0,0.5),
-                0 0 14px rgba(46,204,113,0.75);
-            filter: brightness(1.02);
+                0 7px 18px rgba(0,0,0,0.45),
+                0 0 10px rgba(46,204,113,0.55);
         }
 
-        #submit-weight-btn:disabled {
+        #bluetooth-weight-btn {
+            background: linear-gradient(135deg,
+                        #3498db,
+                        #2c82d0);
+            color: #fff;
+            box-shadow:
+                0 6px 16px rgba(0,0,0,0.45),
+                0 0 10px rgba(52,152,219,0.7);
+        }
+
+        #submit-weight-btn:hover:enabled,
+        #bluetooth-weight-btn:hover:enabled {
+            transform: translateY(-1px) scale(1.01);
+            filter: brightness(1.03);
+        }
+
+        #submit-weight-btn:disabled,
+        #bluetooth-weight-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             box-shadow: none;
         }
 
-        #submit-weight-btn:focus-visible {
+        #submit-weight-btn:focus-visible,
+        #bluetooth-weight-btn:focus-visible {
             outline: 3px solid #ffffff;
             outline-offset: 3px;
         }
@@ -391,6 +404,7 @@
             margin-top: 2px;
             min-height: 1.1em;
             color: #ffb5b5;
+            text-align: center;
         }
 
         .helper-text {
@@ -689,7 +703,13 @@
         ====================================================== */
         @media (max-width: 1200px) {
             #astronaut-container {
-                transform: scale(0.48);
+                transform: scale(0.45);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            #planet-weights {
+                gap: 8px;
             }
         }
 
@@ -718,15 +738,15 @@
 
         @media (max-width: 600px) {
             h1 {
-                font-size: 2.2rem;
+                font-size: 2.1rem;
             }
 
             .subheading {
-                font-size: 1rem;
+                font-size: 0.95rem;
             }
 
             #start-btn {
-                font-size: 1.1rem;
+                font-size: 1.05rem;
                 padding: 8px 20px;
             }
 
@@ -745,11 +765,14 @@
             .field-label {
                 text-align: left;
             }
+
+            #bg-audio {
+                transform: scale(0.7);
+            }
         }
 
         /* =====================================================
-           PRINT: (we now mostly use jsPDF, but keep a minimal
-                   rule set if user prints page directly)
+           PRINT (fallback – main path is jsPDF)
         ====================================================== */
         @media print {
             html,
@@ -849,10 +872,17 @@
                     Submit
                 </button>
 
+                <button id="bluetooth-weight-btn"
+                        type="button"
+                        onclick="getWeightFromScale()">
+                    Use Bluetooth Scale
+                </button>
+
                 <p id="manual-weight-error" role="alert"></p>
                 <p class="helper-text">
-                    Tip: Use your weight on Earth, and we’ll calculate how you’d
-                    feel on each planet.
+                    Tip: Use your weight on Earth, or connect a Bluetooth
+                    scale if your ignators set one up, and we’ll calculate
+                    how you’d feel on each planet.
                 </p>
             </section>
 
@@ -993,8 +1023,8 @@
     const reportTitle       = document.getElementById("report-title");
     const planetWeightsWrap = document.getElementById("planet-weights");
 
-    const introScreen  = document.getElementById("intro-screen");
-    const countdownBox = document.getElementById("countdown");
+    const introScreen   = document.getElementById("intro-screen");
+    const countdownBox  = document.getElementById("countdown");
     const countdownTimerEl = document.getElementById("countdown-timer");
     const manualSection = document.getElementById("manual-weight-section");
     const planetSection = document.getElementById("planet-selection");
@@ -1006,11 +1036,9 @@
     ========================================================== */
 
     function startProcess() {
-        // Hide intro, show countdown
         introScreen.classList.add("hidden");
         countdownBox.classList.remove("hidden");
 
-        // Try to start audio (may be blocked until user interaction)
         if (bgAudio) {
             bgAudio.play().catch(() => {});
         }
@@ -1106,7 +1134,7 @@
         showPlanetCards(weight, name);
     }
 
-    // Allow "Enter" key on weight field to submit
+    // Allow Enter key on weight field to submit
     weightInput.addEventListener("keydown", (ev) => {
         if (ev.key === "Enter") {
             ev.preventDefault();
@@ -1122,8 +1150,72 @@
     });
 
     /* =========================================================
+       BLUETOOTH SCALE INTEGRATION (FRONT-END HOOK)
+       - Expects your backend to expose /get_weight
+         returning { "earth_kg": number }
+    ========================================================== */
+
+    async function getWeightFromScale() {
+        clearError();
+
+        const name = nameInput.value.trim();
+        if (!name) {
+            setError("Please enter your name first, then use the Bluetooth scale.");
+            nameInput.focus();
+            return;
+        }
+
+        const btn = document.getElementById("bluetooth-weight-btn");
+        btn.disabled = true;
+        btn.textContent = "Connecting to scale...";
+
+        try {
+            const response = await fetch("/get_weight", { cache: "no-store" });
+            if (!response.ok) {
+                throw new Error("Scale endpoint error");
+            }
+            const data = await response.json();
+
+            const weight = parseFloat(data.earth_kg);
+            if (isNaN(weight) || weight <= 0) {
+                throw new Error("Invalid weight from scale");
+            }
+
+            weightInput.value = weight.toFixed(2);
+            showPlanetCards(weight, name);
+            clearError();
+        } catch (err) {
+            console.error("Bluetooth / scale error:", err);
+            setError("Could not read from the Bluetooth scale. Check that it's on and paired, then try again.");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Use Bluetooth Scale";
+        }
+    }
+
+    /* =========================================================
        CAMERA CAPTURE LOGIC
     ========================================================== */
+
+    function snapshotVideoToPreview(video, preview) {
+        try {
+            const canvas = document.createElement("canvas");
+            canvas.width  = 200;
+            canvas.height = 200;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, 200, 200);
+
+            const imgUrl = canvas.toDataURL("image/png");
+            const img = document.createElement("img");
+            img.src = imgUrl;
+
+            preview.innerHTML = "";
+            preview.appendChild(img);
+            preview.style.display = "block";
+        } catch (err) {
+            console.error("Snapshot from video failed:", err);
+        }
+    }
 
     function capturePhoto() {
         const captureBtn = document.getElementById("capture-btn");
@@ -1145,18 +1237,7 @@
 
                 // Capture after 10 seconds to give time to pose
                 setTimeout(() => {
-                    const canvas = document.createElement("canvas");
-                    canvas.width  = 200;
-                    canvas.height = 200;
-                    const ctx = canvas.getContext("2d");
-                    ctx.drawImage(video, 0, 0, 200, 200);
-
-                    const imgUrl = canvas.toDataURL("image/png");
-                    const img = document.createElement("img");
-                    img.src = imgUrl;
-
-                    preview.innerHTML = "";
-                    preview.appendChild(img);
+                    snapshotVideoToPreview(video, preview);
 
                     stream.getTracks().forEach((t) => t.stop());
                     captureBtn.disabled = false;
@@ -1185,6 +1266,15 @@
             .replace(/\s+/g, "_") || "Space_Report";
 
         const originalScrollY = window.scrollY;
+
+        // Ensure the helmet holds a static image (if video still running)
+        const preview = document.getElementById("camera-preview");
+        const previewVideo = preview.querySelector("video");
+        if (previewVideo && previewVideo.srcObject) {
+            snapshotVideoToPreview(previewVideo, preview);
+            previewVideo.srcObject.getTracks().forEach((t) => t.stop());
+            previewVideo.srcObject = null;
+        }
 
         document.body.classList.add("snapshot-mode");
         window.scrollTo(0, 0);
