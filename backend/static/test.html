@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Weight Across the Solar System</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ========== General Styling ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            /* Allow vertical scroll so content never gets chopped off */
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: #f0f4f8;
+        }
+
+        /* Utility class for show/hide logic */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ========== Background Animation ========== */
+        .stars {
+            position: fixed;
+            inset: 0;
+            background: url('//live.staticflickr.com/65535/52259221868_53dae692b6_h.jpg') no-repeat center center;
+            background-size: cover;
+            animation: starAnimation 50s infinite linear;
+            z-index: -1;
+        }
+
+        @keyframes starAnimation {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+
+        /* ========== Main Container ========== */
+        #app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 40px 20px 80px;
+            background: linear-gradient(135deg,
+                    rgba(2, 0, 36, 0.7),
+                    rgba(156, 255, 255, 0.5),
+                    rgba(245, 253, 255, 0.5));
+            position: relative;
+            text-align: center;
+            color: #fff;
+        }
+
+        /* ========== Logo Styling ========== */
+        .logo {
+            width: 700px;
+            max-width: 100%;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .logo:hover {
+            transform: scale(1.1);
+        }
+
+        /* ========== Main Heading ========== */
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            animation: textAnimation 2s ease-in-out;
+        }
+
+        @keyframes textAnimation {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== Subheading ========== */
+        .subheading {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            color: #ffffff;
+            animation: fadeIn 2.5s ease-in-out;
+            max-width: 900px;
+        }
+
+        /* ========== Start Button ========== */
+        #start-btn {
+            padding: 15px 50px;
+            background-color: #ff8d22;
+            font-weight: 600;
+            color: white;
+            font-size: 2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        #start-btn:hover {
+            background-color: #ff4500;
+            transform: scale(1.05);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ========== Countdown Section ========== */
+        #countdown {
+            margin-top: 20px;
+        }
+
+        #countdown h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        #countdown-timer {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #ff6347;
+        }
+
+        /* ========== Planet Selection ========== */
+        #planet-selection {
+            margin-top: 40px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        #planet-selection h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        #planet-weights {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+            transition: grid-template-columns 0.3s ease;
+        }
+
+        .planet-card {
+            background-color: #f1f1f1;
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+
+        .planet-card:hover {
+            background-color: #3498db;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .planet-card img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+            object-fit: cover;
+        }
+
+        .planet-card img:hover {
+            transform: scale(1.1);
+        }
+
+        .planet-card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .planet-card p {
+            font-size: 1.1rem;
+            margin-top: 8px;
+        }
+
+        /* ========== Manual Weight Input Section ========== */
+        #manual-weight-section {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        #manual-weight-section label {
+            font-size: 1rem;
+        }
+
+        #manual-weight-input {
+            padding: 10px;
+            margin: 10px;
+            font-size: 1rem;
+            width: 160px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #submit-weight-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        #submit-weight-btn:hover:enabled {
+            background-color: #45a049;
+            transform: scale(1.03);
+        }
+
+        #manual-weight-error {
+            margin-top: 5px;
+            color: #ffdddd;
+        }
+
+        /* ========== Astronaut and Camera Section ========== */
+        #astronaut-container {
+            position: fixed;
+            top: 5%;
+            right: 2%;
+            z-index: 999;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            /* Responsive sizing */
+            width: 30vw;
+            max-width: 400px;
+            min-width: 220px;
+        }
+
+        #astronaut-img {
+            width: 100%;
+            height: auto;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            display: block;
+        }
+
+        #astronaut-container:hover #astronaut-img {
+            transform: scale(1.03);
+        }
+
+        /* Camera Preview (inside astronaut's helmet) */
+        #camera-preview {
+            position: absolute;
+            top: 25%;
+            left: 52%;
+            transform: translate(-50%, -50%);
+            width: 245px;
+            max-width: 60%;
+            height: 200px;
+            border-radius: 38%;
+            border: 5px solid #000000e0;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: none;
+            background: #000;
+        }
+
+        /* Glass / vignette overlay on the helmet window */
+        #camera-preview::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 38%;
+            box-shadow:
+                0 0 70px rgba(0, 0, 0, 0.9) inset,
+                0 0 12px rgba(53, 51, 51, 0.5);
+            pointer-events: none;
+        }
+
+        /* Make video / captured image fill the window nicely */
+        #camera-preview video,
+        #camera-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.5);
+            -webkit-mask-image: radial-gradient(circle at 50% 50%,
+                    rgba(0, 0, 0, 1) 55%,
+                    rgba(0, 0, 0, 0) 95%);
+            mask-image: radial-gradient(circle at 50% 50%,
+                    rgba(0, 0, 0, 1) 55%,
+                    rgba(0, 0, 0, 0) 95%);
+        }
+
+        /* Capture Button */
+        #capture-btn {
+            padding: 8px 20px;
+            background-color: #e74c3c;
+            color: white;
+            font-size: 1rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: block;
+            margin: 10px auto 0;
+        }
+
+        #capture-btn:hover:enabled {
+            background-color: #c0392b;
+            transform: scale(1.05);
+        }
+
+        /* ========== Fullscreen Video Section ========== */
+        .video-section {
+            width: 100%;
+            max-width: 1100px;
+            max-height: 900px;
+            overflow: hidden;
+            margin-top: 40px;
+        }
+
+        .hero-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ========== Responsive tweaks ========== */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.4rem;
+            }
+
+            .subheading {
+                font-size: 1.2rem;
+            }
+
+            #start-btn {
+                font-size: 1.5rem;
+                padding: 12px 30px;
+            }
+
+            #astronaut-container {
+                top: 2%;
+                right: 2%;
+                width: 40vw;
+                max-width: 280px;
+            }
+
+            #camera-preview {
+                width: 60%;
+                height: auto;
+                padding-bottom: 45%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Stars Animation -->
+    <div class="stars"></div>
+
+    <div id="app">
+        <!-- Logo -->
+        <img src="http://agastya-campus-virtual-tour-website.s3-website-us-west-1.amazonaws.com/skin/Image_F01D836E_FAA5_5719_41D4_A5A371EB379E.png?v=1627551939283"
+             alt="Agastya Logo" class="logo">
+
+        <!-- Heading -->
+        <h1>Your Weight Across the Solar System</h1>
+
+        <!-- Subheading -->
+        <div class="subheading">
+            Ever wondered how much you would weigh on other planets? Let's find out!
+        </div>
+
+        <!-- Start Button / Intro Screen -->
+        <div id="intro-screen">
+            <button id="start-btn" type="button" onclick="startProcess()">Start Your Journey</button>
+        </div>
+
+        <!-- Countdown Section -->
+        <div id="countdown" class="hidden">
+            <h2>Starting in...</h2>
+            <p id="countdown-timer">3</p>
+        </div>
+
+        <!-- Planet Selection Section -->
+        <div id="planet-selection" class="hidden">
+            <h2>Select Your Weight</h2>
+            <div id="planet-weights"></div>
+        </div>
+
+        <!-- Manual Weight Input Section -->
+        <div id="manual-weight-section" class="hidden">
+            <label for="manual-weight-input">Enter Your Weight (kg):</label>
+            <input type="number" id="manual-weight-input" placeholder="Enter weight in kg" step="0.1" />
+            <button id="submit-weight-btn" type="button" onclick="submitWeight()">Submit Weight</button>
+            <p id="manual-weight-error"></p>
+        </div>
+
+        <!-- Astronaut and Camera Section -->
+        <div id="astronaut-container">
+            <img src="https://transparent.craiyon.com/2025-11-20/5EyRwmn3QX-A1Sqn37AXig.webp"
+                 id="astronaut-img" alt="Astronaut">
+            <div id="camera-preview">
+                <video id="video" autoplay muted playsinline></video>
+            </div>
+            <button id="capture-btn" type="button" onclick="capturePhoto()">Capture Photo</button>
+        </div>
+
+        <!-- Video Section -->
+        <div class="video-section">
+            <video autoplay muted loop playsinline class="hero-video">
+                <source src="https://video.wixstatic.com/video/e54a34_8be4b46d347a494bb38c03de5073ce9e/480p/mp4/file.mp4"
+                        type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+
+    <!-- face-api.js (kept for future use) -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+    <script>
+        // Shared planet gravity factors (relative to Earth)
+        const PLANET_GRAVITY_FACTORS = {
+            "Mercury": 0.38,
+            "Venus": 0.91,
+            "Earth": 1,
+            "Mars": 0.38,
+            "Jupiter": 2.53,
+            "Saturn": 1.07
+        };
+
+        let countdownInterval = null;
+
+        function startProcess() {
+            console.log("Start process triggered");
+            const intro = document.getElementById('intro-screen');
+            const countdown = document.getElementById('countdown');
+            const timerDisplay = document.getElementById('countdown-timer');
+
+            intro.classList.add('hidden');
+            countdown.classList.remove('hidden');
+
+            let remaining = 3;
+            timerDisplay.textContent = remaining;
+
+            // Clear any previous countdown just in case
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+
+            countdownInterval = setInterval(() => {
+                remaining -= 1;
+                if (remaining <= 0) {
+                    clearInterval(countdownInterval);
+                    countdown.classList.add('hidden');
+                    document.getElementById('manual-weight-section').classList.remove('hidden');
+                    console.log("Countdown complete, showing manual weight section");
+                } else {
+                    timerDisplay.textContent = remaining;
+                    console.log(`Countdown: ${remaining}`);
+                }
+            }, 1000);
+        }
+
+        // Fetch weight from backend scale (feature kept)
+        async function getWeight() {
+            try {
+                const response = await fetch('/get_weight');
+                if (!response.ok) {
+                    throw new Error('Failed to get weight from server');
+                }
+                const data = await response.json();
+                displayPlanetWeights(data.earth_kg);
+            } catch (err) {
+                console.error('Error getting weight from backend:', err);
+                alert('Unable to read weight from the scale. Please enter it manually.');
+            }
+        }
+
+        // Shows planet cards with NASA images (for backend weight path)
+        function displayPlanetWeights(weight) {
+            const planetContainer = document.getElementById('planet-weights');
+            let html = '';
+
+            Object.keys(PLANET_GRAVITY_FACTORS).forEach(planet => {
+                const factor = PLANET_GRAVITY_FACTORS[planet];
+                const planetImageUrl =
+                    `https://solarsystem.nasa.gov/system/news_items/main_images/10443_${planet.toLowerCase()}.jpg`;
+
+                html += `
+                    <div class="planet-card">
+                        <img src="${planetImageUrl}" alt="${planet}">
+                        <h3>${planet}</h3>
+                        <p>${(weight * factor).toFixed(2)} kg</p>
+                    </div>
+                `;
+            });
+
+            planetContainer.innerHTML = html;
+            document.getElementById('planet-selection').classList.remove('hidden');
+        }
+
+        // Manual Weight Input Submission
+        function submitWeight() {
+            const input = document.getElementById('manual-weight-input');
+            const errorEl = document.getElementById('manual-weight-error');
+            const submitBtn = document.getElementById('submit-weight-btn');
+
+            const manualWeight = parseFloat(input.value);
+
+            errorEl.textContent = '';
+            input.style.borderColor = "#ccc";
+
+            if (isNaN(manualWeight) || manualWeight <= 0) {
+                input.style.borderColor = "red";
+                errorEl.textContent = "Please enter a valid weight!";
+                return;
+            }
+
+            submitBtn.disabled = true;
+
+            alert("Weight submitted successfully!");
+
+            calculatePlanetWeights(manualWeight);
+
+            input.value = '';
+        }
+
+        // Calculate and show planet weights (cards without images)
+        function calculatePlanetWeights(weight) {
+            const planetContainer = document.getElementById('planet-weights');
+            let html = '';
+
+            for (const [planet, factor] of Object.entries(PLANET_GRAVITY_FACTORS)) {
+                html += `
+                    <div class="planet-card">
+                        <h3>${planet}</h3>
+                        <p>${(weight * factor).toFixed(2)} kg</p>
+                    </div>
+                `;
+            }
+
+            planetContainer.innerHTML = html;
+            document.getElementById('planet-selection').classList.remove('hidden');
+        }
+
+        // Camera capture inside astronaut helmet
+        function capturePhoto() {
+            const captureBtn = document.getElementById('capture-btn');
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Camera access is not supported in this browser.');
+                return;
+            }
+
+            captureBtn.disabled = true;
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    const videoElement = document.getElementById('video');
+                    const cameraPreview = document.getElementById('camera-preview');
+
+                    videoElement.srcObject = stream;
+                    cameraPreview.style.display = "block";
+
+                    // Capture after 10 seconds (kept as in original)
+                    setTimeout(function () {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 200;
+                        canvas.height = 200;
+                        const context = canvas.getContext('2d');
+                        context.drawImage(videoElement, 0, 0, 200, 200);
+
+                        const imageUrl = canvas.toDataURL('image/png');
+                        const img = document.createElement('img');
+                        img.src = imageUrl;
+
+                        cameraPreview.innerHTML = '';
+                        cameraPreview.appendChild(img);
+
+                        // Stop camera stream
+                        stream.getTracks().forEach(track => track.stop());
+                        captureBtn.disabled = false;
+                    }, 10000);
+                })
+                .catch(function (error) {
+                    console.error("Error accessing the camera: ", error);
+                    alert('Could not access the camera. Please check permissions.');
+                    captureBtn.disabled = false;
+                });
+        }
+    </script>
+</body>
+
+</html>
