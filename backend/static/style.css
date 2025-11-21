@@ -1,0 +1,241 @@
+/* Style for the entire page */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: white;
+    color: #333;
+    text-align: center;
+    padding: 20px;
+}
+
+#app {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Styling for the intro screen */
+#intro-screen {
+    margin: 30px;
+}
+
+#start-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#start-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Countdown styling */
+#countdown {
+    font-size: 30px;
+}
+
+#countdown-timer {
+    font-size: 50px;
+    font-weight: bold;
+}
+
+/* Styling for displaying the weight results */
+#planet-selection, #result {
+    margin-top: 50px;
+}
+
+/* Style for planets list */
+#planet-weights {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    justify-items: center;
+}
+
+.planet-card {
+    background: #f1f1f1;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 150px;
+}
+
+.planet-card img {
+    width: 80%;
+    margin-bottom: 10px;
+}
+
+.planet-card h3 {
+    margin: 10px 0;
+    font-size: 18px;
+}
+#capture-container {
+    text-align: center;
+    margin-top: 50px;
+}
+
+#astronaut-container {
+    position: relative;
+    display: inline-block;
+}
+
+#astronaut-img {
+    width: 300px;
+    height: auto;
+}
+
+#photo-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+#captured-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Styling for the download PDF button */
+button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #218838;
+}
+/* Astronaut and Camera Section */
+#astronaut-container {
+    position: fixed; /* Fixed positioning to keep it in place while scrolling */
+    top: 25%;  /* Adjust as needed to position on the screen */
+    right: 5%; /* Positioning on the right side of the page */
+    z-index: 999;  /* High z-index to make sure it overlays above other elements */
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    width: 350px; /* Width of astronaut container */
+    height: 350px; /* Height of astronaut container */
+}
+
+#astronaut-img {
+    width: 100%;  /* Make the astronaut image fill the container */
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* Shadow effect for the astronaut */
+    transition: transform 0.3s ease;
+}
+
+/* Camera Preview (inside astronaut's helmet) */
+#camera-preview {
+    position: absolute;
+    top: 50%;  /* Center the camera preview vertically inside the astronaut's helmet */
+    left: 50%;  /* Center the camera preview horizontally inside the astronaut's helmet */
+    transform: translate(-50%, -50%);  /* Adjust to perfectly center */
+    width: 200px;  /* Size of the preview inside the astronaut's helmet */
+    height: 200px;  /* Size of the preview inside the astronaut's helmet */
+    border-radius: 50%;  /* Round corners to fit in the helmet */
+    border: 3px solid #fff;  /* White border around the preview */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); /* Shadow effect for the camera preview */
+    overflow: hidden;
+    display: none;  /* Initially hidden */
+}
+
+#camera-preview video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Make sure the video fits well inside the circle */
+}
+
+/* Button Styling */
+#capture-btn {
+    padding: 10px 30px;
+    background-color: #e74c3c;
+    color: white;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: block;
+    margin: 10px auto;
+}
+
+#capture-btn:hover {
+    background-color: #c0392b;
+    transform: scale(1.1);
+}
+/* Astronaut Section */
+#astronaut-container {
+    position: fixed;  /* Fix the astronaut to stay on the page */
+    top: 10%; /* Adjust to position vertically */
+    right: 2%; /* Position on the right side */
+    z-index: 1000;  /* Ensure it's above the video */
+    width: 400px;  /* Increase width for larger astronaut image */
+    height: 400px;  /* Increase height for larger astronaut image */
+    overflow: hidden;
+    border-radius: 50%;  /* Round corners to create the circular effect */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);  /* Add shadow effect */
+}
+
+/* Astronaut Image */
+#astronaut-img {
+    width: 100%;  /* Make it fill the entire container */
+    height: 100%; /* Make it fill the entire container */
+    object-fit: cover;  /* Ensure image fits within the circle */
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+/* Button Styling */
+#capture-btn {
+    padding: 15px 40px;
+    background-color: #e74c3c;
+    color: white;
+    font-size: 1.3em;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);  /* Center the button */
+}
+
+#capture-btn:hover {
+    background-color: #c0392b;
+    transform: scale(1.1);
+}
+
+/* Video Preview Inside the Astronaut */
+#camera-preview {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px;  /* Size of the webcam feed */
+    height: 180px;
+    border-radius: 50%;  /* Round the corners */
+    overflow: hidden;
+    display: none;  /* Initially hidden */
+}
+
+#camera-preview video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* Ensure the video fills the circle */
+}
